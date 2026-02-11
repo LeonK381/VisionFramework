@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e82de60de02164ef4a6ee56733f4f779, type: 3}
   m_Name: "Glasko\u0308rpertru\u0308bungenProfil"
   m_EditorClassIdentifier: 
-  profileName: 
+  profileName: "Glask\xF6rpertr\xFCbungen"
   effects:
   - parameters:
       rid: 4338545421758234713

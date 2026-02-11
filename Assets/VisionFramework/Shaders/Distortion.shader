@@ -1,11 +1,14 @@
-Shader "Vision/Filter/Distortion_Minimal"
+Shader "Vision/Filter/UnifiedDistortion"
 {
     Properties
     {
         _MainTex ("Source", 2D) = "white" {}
-        _Strength ("Strength", Float) = 0.02
-        _AxisControl ("Axis Control", Float) = 0
-        _Rotation ("Rotation", Float) = 0
+        _Strength ("Strength", Float) = 0.01
+        _Rotation ("Rotation (Deg)", Float) = 0
+        _Mode ("Mode (0:AMD, 1:Astig)", Float) = 1
+        
+        _WaveFreq ("Wave Frequency", Float) = 60.0
+        _CenterRad ("Center Radius", Float) = 0.4
     }
     SubShader
     {
@@ -18,9 +21,8 @@ Shader "Vision/Filter/Distortion_Minimal"
             #include "UnityCG.cginc"
 
             sampler2D _MainTex;
-            float _Strength;
-            float _AxisControl;
-            float _Rotation;
+            float _Strength, _Rotation, _Mode;
+            float _WaveFreq, _CenterRad;
 
             struct v2f {
                 float4 vertex : SV_POSITION;
@@ -36,22 +38,26 @@ Shader "Vision/Filter/Distortion_Minimal"
 
             fixed4 frag (v2f i) : SV_Target {
                 float2 uv = i.uv;
-                float rad = _Rotation * 0.0174533; // Grad in Radiant
+                
+                // Rotation in Radiant umrechnen
+                float rad = _Rotation * 0.0174533;
                 float2 dir = float2(cos(rad), sin(rad));
 
-                if (_AxisControl > 0.5) {
-                    // --- ASTIGMATISMUS (Direktionaler Blur) ---
-                    // Wir nehmen zwei Proben in Richtung der Achse versetzt
+                if (_Mode > 0.5) {
+                    // --- ASTIGMATISMUS (Directional Displacement) ---
+                    // Simuliert die leichte Brennpunkt-Verschiebung
                     float2 offset = dir * _Strength;
                     float4 col1 = tex2D(_MainTex, uv + offset);
                     float4 col2 = tex2D(_MainTex, uv - offset);
                     return (col1 + col2) * 0.5;
-                } else {
-                    // --- MAKULADEGENERATION (Wellen) ---
+                } 
+                else {
+                    // --- MAKULADEGENERATION (Metamorphopsia) ---
+                    // Wellenförmige Verzerrung im Zentrum (Amsler-Gitter-Effekt)
                     float dist = distance(uv, float2(0.5, 0.5));
-                    // Stärkere Wellen-Mathematik
-                    float wave = sin(dist * 60.0) * _Strength;
-                    float mask = smoothstep(0.4, 0.0, dist);
+                    float wave = sin(dist * _WaveFreq) * _Strength;
+                    float mask = smoothstep(_CenterRad, 0.0, dist);
+                    
                     uv += dir * wave * mask;
                     return tex2D(_MainTex, uv);
                 }

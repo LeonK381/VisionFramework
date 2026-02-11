@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e82de60de02164ef4a6ee56733f4f779, type: 3}
   m_Name: GlaukomProfil
   m_EditorClassIdentifier: 
-  profileName: 
+  profileName: Glaukom
   effects:
   - parameters:
       rid: 4338545421758234708
@@ -23,7 +23,7 @@ MonoBehaviour:
       type: {class: FieldOfViewParameters, ns: , asm: Assembly-CSharp}
       data:
         effectType: 2
-        defectType: 0
-        radius: 0.1
+        defectType: 1
+        radius: 0.2
         softness: 0.15
         center: {x: 0.5, y: 0.5}

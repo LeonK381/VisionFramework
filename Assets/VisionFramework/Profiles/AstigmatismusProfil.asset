@@ -12,17 +12,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e82de60de02164ef4a6ee56733f4f779, type: 3}
   m_Name: AstigmatismusProfil
   m_EditorClassIdentifier: 
-  profileName: 
+  profileName: Astigmatismus
   effects:
   - parameters:
-      rid: 4338545421758234709
+      rid: 4338545484542246990
+  - parameters:
+      rid: 4338545484542246991
   references:
     version: 2
     RefIds:
-    - rid: 4338545421758234709
+    - rid: 4338545484542246990
+      type: {class: BlurParameters, ns: , asm: Assembly-CSharp}
+      data:
+        effectType: 0
+        blurStrength: 0
+        blurDirection: {x: 0, y: 1}
+        useFovea: 0
+        invertFovea: 0
+        foveaRadius: 0.25
+        foveaSoftness: 0.15
+        foveaCenter: {x: 0.5, y: 0.5}
+    - rid: 4338545484542246991
       type: {class: DistortionParameters, ns: , asm: Assembly-CSharp}
       data:
         effectType: 3
-        strength: 0.05
-        axisControl: 1
+        mode: 1
+        strength: 0.03543
         rotation: 90
+        waveFrequency: 60
+        centerRadius: 0.4

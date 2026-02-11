@@ -209,11 +209,10 @@ MonoBehaviour:
   version: 0.1.0
   featureIdInternal: com.unity.openxr.feature.arfoundation-meta-plane
   openxrExtensionStrings: XR_FB_scene XR_FB_spatial_entity XR_FB_spatial_entity_container
-    XR_META_spatial_entity_discovery XR_META_spatial_entity_semantic_label XR_META_spatial_entity_room_mesh
+    XR_META_spatial_entity_discovery
   company: Unity Technologies
   priority: 0
   required: 0
-  m_PlaneProviderType: 1
 --- !u!114 &-7133038868019001718
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1668,11 +1667,10 @@ MonoBehaviour:
   version: 0.1.0
   featureIdInternal: com.unity.openxr.feature.arfoundation-meta-plane
   openxrExtensionStrings: XR_FB_scene XR_FB_spatial_entity XR_FB_spatial_entity_container
-    XR_META_spatial_entity_discovery XR_META_spatial_entity_semantic_label XR_META_spatial_entity_room_mesh
+    XR_META_spatial_entity_discovery
   company: Unity Technologies
   priority: 0
   required: 0
-  m_PlaneProviderType: 1
 --- !u!114 &8166212654392320859
 MonoBehaviour:
   m_ObjectHideFlags: 0

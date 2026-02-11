@@ -3,18 +3,27 @@ using UnityEngine;
 [System.Serializable]
 public class DistortionParameters : VisualEffectParameters
 {
-    // Stärke der Verzerrung
-    [Range(0f, 0.1f)]
-    public float strength = 0.02f;
+    public enum DistortionMode { AMD_Waves = 0, Astigmatism = 1 }
 
-    // 0 = Lokal/Wellig (Makula), >0 = Global/Gerichtet (Astigmatismus)
-    // Wir nutzen dies, um zwischen Sinus-Wellen und einer Streckung zu wählen
-    [Range(0f, 1f)]
-    public float axisControl = 0f; 
+    [Header("Mode Selection")]
+    public DistortionMode mode = DistortionMode.Astigmatism;
 
-    // Der Winkel der Verzerrung (Wichtig für Astigmatismus: 0°, 90°, 180°)
+    [Header("Common Settings")]
+    [Range(0f, 0.05f)]
+    public float strength = 0.01f;
+    
+    [Tooltip("Rotation in degrees (used for Astigmatism axis or Wave direction)")]
     [Range(0f, 360f)]
     public float rotation = 0f;
 
-    public DistortionParameters() { effectType = VisualEffectType.Distortion; }
+    [Header("AMD Wave Settings")]
+    [Range(10f, 100f)]
+    public float waveFrequency = 60.0f;
+    [Range(0f, 1f)]
+    public float centerRadius = 0.4f;
+
+    public DistortionParameters()
+    {
+        effectType = VisualEffectType.Distortion;
+    }
 }

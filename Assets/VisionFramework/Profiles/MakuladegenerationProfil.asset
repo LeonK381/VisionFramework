@@ -12,10 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e82de60de02164ef4a6ee56733f4f779, type: 3}
   m_Name: MakuladegenerationProfil
   m_EditorClassIdentifier: 
-  profileName: 
+  profileName: Makuladegeneration
   effects:
   - parameters:
       rid: 4338545421758234710
+  - parameters:
+      rid: 4338545484542246992
+  - parameters:
+      rid: 4338545484542246993
   references:
     version: 2
     RefIds:
@@ -23,6 +27,27 @@ MonoBehaviour:
       type: {class: DistortionParameters, ns: , asm: Assembly-CSharp}
       data:
         effectType: 3
-        strength: 0.1
-        axisControl: 0
+        mode: 0
+        strength: 0.02
         rotation: 0
+        waveFrequency: 60
+        centerRadius: 0.253
+    - rid: 4338545484542246992
+      type: {class: FieldOfViewParameters, ns: , asm: Assembly-CSharp}
+      data:
+        effectType: 2
+        defectType: 0
+        radius: 0.1
+        softness: 0.051
+        center: {x: 0.5, y: 0.5}
+    - rid: 4338545484542246993
+      type: {class: BlurParameters, ns: , asm: Assembly-CSharp}
+      data:
+        effectType: 0
+        blurStrength: 2
+        blurDirection: {x: 1, y: 1}
+        useFovea: 1
+        invertFovea: 1
+        foveaRadius: 0.3
+        foveaSoftness: 0.15
+        foveaCenter: {x: 0.5, y: 0.5}

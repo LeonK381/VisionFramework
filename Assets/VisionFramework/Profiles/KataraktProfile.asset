@@ -12,12 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e82de60de02164ef4a6ee56733f4f779, type: 3}
   m_Name: KataraktProfile
   m_EditorClassIdentifier: 
-  profileName: 
+  profileName: Katarakt
   effects:
   - parameters:
       rid: 4338545421758234706
   - parameters:
       rid: 4338545421758234707
+  - parameters:
+      rid: 4338545484542246994
   references:
     version: 2
     RefIds:
@@ -25,13 +27,21 @@ MonoBehaviour:
       type: {class: ContrastParameters, ns: , asm: Assembly-CSharp}
       data:
         effectType: 1
-        contrastFactor: 0.7
+        contrastFactor: 0.9
     - rid: 4338545421758234707
       type: {class: BlurParameters, ns: , asm: Assembly-CSharp}
       data:
         effectType: 0
-        blurStrength: 2
+        blurStrength: 0.1
+        blurDirection: {x: 1, y: 1}
         useFovea: 0
+        invertFovea: 0
         foveaRadius: 0.25
         foveaSoftness: 0.15
         foveaCenter: {x: 0.5, y: 0.5}
+    - rid: 4338545484542246994
+      type: {class: ColorChangeParameters, ns: , asm: Assembly-CSharp}
+      data:
+        effectType: 4
+        defectType: 2
+        intensity: 0.7
