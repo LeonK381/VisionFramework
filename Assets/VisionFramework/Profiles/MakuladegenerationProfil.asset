@@ -18,8 +18,6 @@ MonoBehaviour:
       rid: 4338545421758234710
   - parameters:
       rid: 4338545484542246992
-  - parameters:
-      rid: 4338545484542246993
   references:
     version: 2
     RefIds:
@@ -30,24 +28,18 @@ MonoBehaviour:
         mode: 0
         strength: 0.02
         rotation: 0
-        waveFrequency: 60
-        centerRadius: 0.253
+        waveFrequency: 80.6
+        centerRadius: 0.3
     - rid: 4338545484542246992
       type: {class: FieldOfViewParameters, ns: , asm: Assembly-CSharp}
       data:
         effectType: 2
         defectType: 0
-        radius: 0.1
+        radius: 0.101
         softness: 0.051
         center: {x: 0.5, y: 0.5}
-    - rid: 4338545484542246993
-      type: {class: BlurParameters, ns: , asm: Assembly-CSharp}
-      data:
-        effectType: 0
-        blurStrength: 2
-        blurDirection: {x: 1, y: 1}
-        useFovea: 1
-        invertFovea: 1
-        foveaRadius: 0.3
-        foveaSoftness: 0.15
-        foveaCenter: {x: 0.5, y: 0.5}
+        sensitivityLoss: 0.85
+        irregularity: 0
+        arcCurvature: 0.25
+        arcThickness: 0.05
+        arcRotation: 0

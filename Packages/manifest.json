@@ -1,14 +1,15 @@
 {
   "dependencies": {
-    "com.meta.xr.mrutilitykit": "81.0.0",
-    "com.meta.xr.sdk.all": "83.0.4",
+    "com.meta.xr.sdk.all": "85.0.0",
     "com.unity.feature.development": "1.0.2",
     "com.unity.mobile.android-logcat": "1.4.6",
     "com.unity.render-pipelines.universal": "17.0.4",
     "com.unity.sentis": "2.2.0",
     "com.unity.ugui": "2.0.0",
+    "com.unity.xr.arfoundation": "6.3.3",
+    "com.unity.xr.arkit": "6.3.3",
     "com.unity.xr.interaction.toolkit": "3.0.10",
-    "com.unity.xr.management": "4.5.3",
+    "com.unity.xr.management": "4.5.4",
     "com.unity.xr.meta-openxr": "2.3.0",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",

@@ -27,23 +27,37 @@ MonoBehaviour:
       type: {class: ContrastParameters, ns: , asm: Assembly-CSharp}
       data:
         effectType: 1
-        contrastFactor: 0.959
+        contrastFactor: 1
     - rid: 4338545552221798401
       type: {class: ArtifactsParameters, ns: , asm: Assembly-CSharp}
       data:
         effectType: 5
-        floaterIntensity: 0.9
-        density: 10
-        size: 2
-        driftSpeed: 0.02
+        floaterIntensity: 0.7
+        density: 23.94
+        size: 0.746
+        driftSpeed: 0
+        darkness: 4
+        transparency: 0.8
+        artifactMode: 0
     - rid: 4338545552221798402
       type: {class: BlurParameters, ns: , asm: Assembly-CSharp}
       data:
         effectType: 0
         blurStrength: 0.5
-        blurDirection: {x: 1, y: 1}
+        anisotropy: 0
+        axisAngle: 0
+        samples: 7
+        useDepthBlur: 0
+        focusDistance: 0.5
+        depthIntensityMultiplier: 1
+        maxDiopters: 6
+        defocusMode: 0
         useFovea: 0
         invertFovea: 0
         foveaRadius: 0.25
         foveaSoftness: 0.15
         foveaCenter: {x: 0.5, y: 0.5}
+        chromaticShift: 0
+        anisotropicContrastLoss: 0
+        scatterStrength: 0
+        scatterThreshold: 0.6

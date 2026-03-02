@@ -15,11 +15,11 @@ MonoBehaviour:
   profileName: Protanopie
   effects:
   - parameters:
-      rid: 4338545421758234711
+      rid: 4338545898744184911
   references:
     version: 2
     RefIds:
-    - rid: 4338545421758234711
+    - rid: 4338545898744184911
       type: {class: ColorChangeParameters, ns: , asm: Assembly-CSharp}
       data:
         effectType: 4

@@ -24,6 +24,13 @@ MonoBehaviour:
       data:
         effectType: 2
         defectType: 1
-        radius: 0.2
-        softness: 0.15
+        radius: 0.15
+        softness: 0.101
         center: {x: 0.5, y: 0.5}
+        sensitivityLoss: 0.75
+        irregularity: 0.02
+        angularIrregularity: 0.08
+        noiseScale: 3
+        arcCurvature: 0.25
+        arcThickness: 0.03
+        arcRotation: 0

@@ -3,8 +3,9 @@ using Meta.XR;
 using Meta.XR.Samples;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
-public class ShaderSampleManager : MonoBehaviour
+public class MetaPassthroughProvider : MonoBehaviour
 {
     [SerializeField] private PassthroughCameraAccess m_cameraAccess;
     [SerializeField] private EffectPipelineManager pipelineManager;
@@ -21,9 +22,8 @@ public class ShaderSampleManager : MonoBehaviour
         {
             yield return null;
         }
-        // Passthrough-Texture NICHT auf Quad,
-        // sondern in die Pipeline einspeisen
+
         pipelineManager.SetInputTexture(m_cameraAccess.GetTexture());
+        Debug.Log("Meta Passthrough Texture an Pipeline gesendet.");
     }
 }
-

@@ -15,29 +15,29 @@ MonoBehaviour:
   profileName: Astigmatismus
   effects:
   - parameters:
-      rid: 4338545484542246990
-  - parameters:
-      rid: 4338545484542246991
+      rid: 4338545870973435983
   references:
     version: 2
     RefIds:
-    - rid: 4338545484542246990
+    - rid: 4338545870973435983
       type: {class: BlurParameters, ns: , asm: Assembly-CSharp}
       data:
         effectType: 0
-        blurStrength: 0
-        blurDirection: {x: 0, y: 1}
+        blurStrength: 1.5
+        anisotropy: 0.45
+        axisAngle: 45.2
+        samples: 11
+        useDepthBlur: 0
+        focusDistance: 0.5
+        depthIntensityMultiplier: 1
+        maxDiopters: 6
+        defocusMode: 0
         useFovea: 0
         invertFovea: 0
         foveaRadius: 0.25
         foveaSoftness: 0.15
         foveaCenter: {x: 0.5, y: 0.5}
-    - rid: 4338545484542246991
-      type: {class: DistortionParameters, ns: , asm: Assembly-CSharp}
-      data:
-        effectType: 3
-        mode: 1
-        strength: 0.03543
-        rotation: 90
-        waveFrequency: 60
-        centerRadius: 0.4
+        chromaticShift: 0.0003
+        anisotropicContrastLoss: 0.18
+        scatterStrength: 0
+        scatterThreshold: 0.6

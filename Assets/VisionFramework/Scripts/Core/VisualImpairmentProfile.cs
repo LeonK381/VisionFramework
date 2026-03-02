@@ -8,7 +8,6 @@ public class VisualImpairmentProfile : ScriptableObject
 
     public List<VisualEffectEntry> effects = new();
 
-    // 🔹 Allgemeine Factory-Methode
     public void AddEffect(VisualEffectType type)
     {
         var entry = new VisualEffectEntry();
@@ -16,7 +15,6 @@ public class VisualImpairmentProfile : ScriptableObject
         effects.Add(entry);
     }
 
-    // 🔹 Komfortfunktionen für den Inspector
     [ContextMenu("Add Blur Effect")]
     private void AddBlur()
     {
@@ -50,7 +48,6 @@ public class VisualImpairmentProfile : ScriptableObject
     private void AddArtifacts() {
         AddEffect(VisualEffectType.Artifacts);
     }
-
 }
 
 
