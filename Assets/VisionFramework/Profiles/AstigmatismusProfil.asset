@@ -23,13 +23,12 @@ MonoBehaviour:
       type: {class: BlurParameters, ns: , asm: Assembly-CSharp}
       data:
         effectType: 0
-        blurStrength: 1.5
-        anisotropy: 0.45
+        blurStrength: 1
+        anisotropy: 0.801
         axisAngle: 45.2
         samples: 11
         useDepthBlur: 0
         focusDistance: 0.5
-        depthIntensityMultiplier: 1
         maxDiopters: 6
         defocusMode: 0
         useFovea: 0
@@ -38,6 +37,6 @@ MonoBehaviour:
         foveaSoftness: 0.15
         foveaCenter: {x: 0.5, y: 0.5}
         chromaticShift: 0.0003
-        anisotropicContrastLoss: 0.18
+        anisotropicContrastLoss: 0.703
         scatterStrength: 0
         scatterThreshold: 0.6

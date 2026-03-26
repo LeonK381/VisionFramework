@@ -5,10 +5,10 @@ public class DistortionParameters : VisualEffectParameters
 {
     public enum DistortionMode { AMD_Waves = 0, Astigmatism = 1 }
 
-    [Header("Mode Selection")]
+    [Header("Mode")]
     public DistortionMode mode = DistortionMode.Astigmatism;
 
-    [Header("Common Settings")]
+    [Header("Global Distortion Settings")]
     [Range(0f, 0.05f)]
     public float strength = 0.01f;
     

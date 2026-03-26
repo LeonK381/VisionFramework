@@ -8,17 +8,12 @@ Shader "Vision/Filter/FieldOfViewDefect"
         _Softness ("Softness", Float) = 0.1
         _Center ("Center", Vector) = (0.5,0.5,0,0)
 
-        _Type ("Defect Type (0=Central,1=Peripheral,2=Arcuate)", Float) = 0
+        _Type ("Defect Type (0=Central,1=Peripheral)", Float) = 0
 
         _SensitivityLoss ("Sensitivity Loss", Range(0,1)) = 0.8
         _Irregularity ("Edge Irregularity", Range(0,0.05)) = 0
 	_AngularIrregularity ("Angular Irregularity", Range(0,0.2)) = 0.05
 	_NoiseScale ("Shape Scale", Float) = 6
-
-        // NEW — arcuate scotoma
-        _ArcCurvature ("Arc Curvature", Float) = 0.25
-        _ArcThickness ("Arc Thickness", Float) = 0.05
-        _ArcRotation ("Arc Rotation", Float) = 0
     }
 
     SubShader
@@ -43,10 +38,6 @@ Shader "Vision/Filter/FieldOfViewDefect"
             float _Irregularity;
 	    float _AngularIrregularity;
 	    float _NoiseScale;
-
-            float _ArcCurvature;
-            float _ArcThickness;
-            float _ArcRotation;
 
             struct v2f {
                 float4 vertex : SV_POSITION;
@@ -94,17 +85,13 @@ float hash(float2 p)
 
                 float defectMask = 0;
 
-                // CENTRAL
-                // CENTRAL (Zentrales Skotom)
 if (_Type < 0.5)
 {
     float dist = distance(uv,_Center)+noise;
     float mask = smoothstep(_Radius,_Radius+_Softness,dist);
 
-    // Zentrum dunkel
     defectMask = 1 - mask;
 }
-// PERIPHERAL (Tunnelblick)
 else if (_Type < 1.5)
 {
     float2 d = uv - _Center;
@@ -112,7 +99,6 @@ else if (_Type < 1.5)
     float angle = atan2(d.y, d.x);
     float dist  = length(d);
 
-    // Winkelabhängige Radius-Verformung
     float angularNoise =
         noiseSmooth(float2(angle * _NoiseScale, 0));
 
@@ -125,23 +111,7 @@ else if (_Type < 1.5)
         distortedRadius + _Softness,
         dist);
 }
-                // ARCUATE SCOTOMA (Bjerrum)
-                else
-                {
-                    float2 p = uv - _Center;
-
-                    float rad = _ArcRotation * 0.0174533;
-                    float2x2 rot = float2x2(cos(rad),-sin(rad),sin(rad),cos(rad));
-                    p = mul(rot,p);
-
-                    // curved arc distance
-                    float curve = abs(length(p - float2(_ArcCurvature,0)) - _Radius);
-
-                    defectMask = smoothstep(
-                        _ArcThickness,
-                        _ArcThickness + _Softness,
-                        curve);
-                }
+                
 
                 float sensitivity = lerp(1.0,1.0-_SensitivityLoss,defectMask);
                 col.rgb *= sensitivity;

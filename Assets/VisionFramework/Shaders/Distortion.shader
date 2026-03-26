@@ -39,21 +39,16 @@ Shader "Vision/Filter/UnifiedDistortion"
             fixed4 frag (v2f i) : SV_Target {
                 float2 uv = i.uv;
                 
-                // Rotation in Radiant umrechnen
                 float rad = _Rotation * 0.0174533;
                 float2 dir = float2(cos(rad), sin(rad));
 
                 if (_Mode > 0.5) {
-                    // --- ASTIGMATISMUS (Directional Displacement) ---
-                    // Simuliert die leichte Brennpunkt-Verschiebung
                     float2 offset = dir * _Strength;
                     float4 col1 = tex2D(_MainTex, uv + offset);
                     float4 col2 = tex2D(_MainTex, uv - offset);
                     return (col1 + col2) * 0.5;
                 } 
                 else {
-                    // --- MAKULADEGENERATION (Metamorphopsia) ---
-                    // Wellenförmige Verzerrung im Zentrum (Amsler-Gitter-Effekt)
                     float dist = distance(uv, float2(0.5, 0.5));
                     float wave = sin(dist * _WaveFreq) * _Strength;
                     float mask = smoothstep(_CenterRad, 0.0, dist);

@@ -2,9 +2,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.XR;
+using UnityEngine.EventSystems;
 
 public class EffectPipelineManager : MonoBehaviour
 {
+    public CompensationPipelineManager compensationManager;
+
+    public Material displayMaterial;
+
     [Header("Render Targets")]
     public RenderTexture inputCopyRT; 
     public RenderTexture outputRT; 
@@ -20,13 +26,14 @@ public class EffectPipelineManager : MonoBehaviour
     public List<VisualImpairmentProfile> availableProfiles;
     private int currentProfileIndex = 0;
 
-    [Header("Live Control")]
-    [Range(0f, 2f)] public float masterIntensity = 1.0f; 
-    public float changeSpeed = 0.5f;
+  
+    [Range(0f, 2f)] private float masterIntensity = 1.0f; 
+    private float changeSpeed = 0.5f;
 
     [Header("Apple / Mobile UI")]
     public RawImage screenOutputUI; 
 
+    [Header("Eye-Tracking")]
     private List<Material> effectStack = new List<Material>();
     private RenderTexture tempA;
     private RenderTexture tempB;
@@ -34,11 +41,19 @@ public class EffectPipelineManager : MonoBehaviour
 
     public Camera mainCamera;
 
-    public Transform eyeGaze;
+    private InputDevice eyeDevice;
+    private bool eyeTrackingAvailable = false;
+    public float gazeMoveSpeed = 0.4f;
+
+    private Vector2 profileCenter = new Vector2(0.5f,0.5f);
+
+    private Vector2 gazeUV = new Vector2(0.5f,0.5f);
     private Texture depthTexture;
 
     void Start()
     {  
+        InitializeEyeTracking();
+
         if (availableProfiles == null || availableProfiles.Count == 0 || outputRT == null)
         {
             return;
@@ -66,6 +81,45 @@ public class EffectPipelineManager : MonoBehaviour
         depthTexture = tex;
     }
 
+    void InitializeEyeTracking()
+{
+    List<InputDevice> devices = new List<InputDevice>();
+
+    InputDevices.GetDevicesWithCharacteristics(
+        InputDeviceCharacteristics.EyeTracking,
+        devices
+    );
+
+    if(devices.Count > 0)
+    {
+        eyeDevice = devices[0];
+        eyeTrackingAvailable = true;
+
+        Debug.Log("Eye Tracking gefunden: " + eyeDevice.name);
+    }
+    else
+    {
+        eyeTrackingAvailable = false;
+        Debug.Log("Kein Eye Tracking verfügbar.");
+    }
+}
+
+bool IsTouchOnSlider()
+{
+    if (Input.touchCount == 0 || intensitySlider == null)
+        return false;
+
+    Touch touch = Input.GetTouch(0);
+
+    RectTransform sliderRect = intensitySlider.GetComponent<RectTransform>();
+
+    return RectTransformUtility.RectangleContainsScreenPoint(
+        sliderRect,
+        touch.position,
+        null
+    );
+}
+
     public void SwitchToNextProfile()
     {
         if (availableProfiles.Count == 0) return;
@@ -74,6 +128,7 @@ public class EffectPipelineManager : MonoBehaviour
         masterIntensity = 1.0f;
         if (intensitySlider != null) intensitySlider.value = 1.0f;
         ApplyProfile(activeProfile);
+        gazeUV = profileCenter;
         UpdateUI(activeProfile.profileName); 
     }
 
@@ -92,36 +147,97 @@ public class EffectPipelineManager : MonoBehaviour
 
     public void SetInputTexture(Texture tex) => inputTexture = tex;
 
-   bool TryGetEyeGazeUV(out Vector2 uv)
+  bool TryGetOpenXRGaze(out Vector2 uv)
 {
-    uv = new Vector2(0.5f, 0.5f);
+    uv = gazeUV;
 
-    if (eyeGaze == null || mainCamera == null) 
+    if(!eyeTrackingAvailable || !eyeDevice.isValid)
         return false;
 
-    Vector3 origin = eyeGaze.position;
-    Vector3 forward = eyeGaze.forward;
+    if(eyeDevice.TryGetFeatureValue(CommonUsages.eyesData, out Eyes eyes))
+    {
+        if(eyes.TryGetFixationPoint(out Vector3 fixationPoint))
+        {
+            Vector3 viewport = mainCamera.WorldToViewportPoint(fixationPoint);
 
-    Vector3 worldPoint = origin + forward * 10f;
+            uv = new Vector2(viewport.x, viewport.y);
 
-    Vector3 viewport = mainCamera.WorldToViewportPoint(worldPoint);
+            return true;
+        }
+    }
 
-    uv = new Vector2(viewport.x, viewport.y);
-
-    return true;
+    return false;
 }
 
-float GetDiopters(float intensity, BlurParameters blur)
+void UpdateSimulatedGaze()
 {
-    float maxDpt = blur.maxDiopters; 
+    Vector2 joy = OVRInput.Get(OVRInput.RawAxis2D.LThumbstick);
 
-    float dpt = Mathf.Lerp(0f, maxDpt, intensity);
+    if(joy.magnitude > 0.1f)
+    {
+        gazeUV += joy * gazeMoveSpeed * Time.deltaTime;
 
-    if (blur.defocusMode == DefocusMode.Myopie)
-        dpt *= -1f;
-
-    return dpt;
+        gazeUV.x = Mathf.Clamp01(gazeUV.x);
+        gazeUV.y = Mathf.Clamp01(gazeUV.y);
+    }
 }
+
+void UpdateGaze()
+{
+    Vector2 uv;
+
+    if(TryGetOpenXRGaze(out uv))
+    {
+        gazeUV = uv;
+        return;
+    }
+
+    if(Application.platform == RuntimePlatform.IPhonePlayer)
+    {
+        UpdateTouchGaze();
+        return;
+    }
+
+    if(Application.platform == RuntimePlatform.Android)
+    {
+        UpdateSimulatedGaze();
+    }
+}
+
+void UpdateShaderGaze()
+{
+    foreach(Material effect in effectStack)
+    {
+        if(effect == null) continue;
+
+        if(effect.HasProperty("_Center"))
+            effect.SetVector("_Center", gazeUV);
+    }
+}
+void UpdateTouchGaze()
+{
+    if(Input.touchCount > 0)
+    {
+        if(IsTouchOnSlider())
+            return;
+
+        Touch touch = Input.GetTouch(0);
+
+        if(touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Moved)
+        {
+            Vector2 pos = touch.position;
+
+            gazeUV = new Vector2(
+                pos.x / Screen.width,
+                pos.y / Screen.height
+            );
+
+            gazeUV.x = Mathf.Clamp01(gazeUV.x);
+            gazeUV.y = Mathf.Clamp01(gazeUV.y);
+        }
+    }
+}
+
     public void ApplyProfile(VisualImpairmentProfile profile)
 {
     if (profile == null || effectLibrary == null) return;
@@ -152,64 +268,76 @@ float GetDiopters(float intensity, BlurParameters blur)
             case VisualEffectType.Blur:
 
                 var blur = (BlurParameters)p;
+                float blurStrength = blur.blurStrength;
 
-                float scatterScaled = blur.scatterStrength * (normalized * normalized);
-                float blurScaled = blur.blurStrength * Mathf.Lerp(0.5f, 1.2f, normalized);
-
-                mat.SetFloat("_EnableBlur", 1f);
-                float baseStrength = blur.blurStrength * masterIntensity;
-
-                if (!blur.useDepthBlur || depthTexture == null)
+                if (!blur.useDepth || depthTexture == null)
                 {
                     Debug.Log("Depth ist nicht vorhanden!");
-                    baseStrength *= 0.01f;
+                    blurStrength *= 0.01f * masterIntensity;
                 }
                 else
                 {
                     Debug.Log("Depth ist vorhanden!");
-                    baseStrength *= 0.004f;
+                    blurStrength *= 0.01f;
                 }
 
-                mat.SetFloat("_BaseStrength", baseStrength);
+                mat.SetFloat("_BlurStrength", blurStrength);
 
-                mat.SetFloat("_Anisotropy", blur.anisotropy);
+                mat.SetFloat("_Anisotropy", blur.anisotropy * masterIntensity);
                 mat.SetFloat("_AxisAngle", blur.axisAngle);
-                mat.SetInt("_Samples", blur.samples);
-
-                mat.SetFloat("_ChromaticShift", blur.chromaticShift);
-                mat.SetFloat("_AnisoContrastLoss", blur.anisotropicContrastLoss);
+                mat.SetInt("_Samples", blur.sampleCount);
 
                 bool hasDepth = depthTexture != null;
                 mat.SetFloat("_UseDepth",
-                    (blur.useDepthBlur && hasDepth) ? 1f : 0f);
-                /*
-                float diopters = GetDiopters(masterIntensity, blur);
-                float focusShift = Mathf.Clamp01(0.5f + diopters * 0.08f);
-                mat.SetFloat("_FocusDistance", focusShift);*/
-                mat.SetFloat("_FocusDistance", blur.focusDistance);
-                //float depthMul = blur.depthIntensityMultiplier * Mathf.Lerp(0.5f, 1.5f, Mathf.Abs(diopters)/blur.maxDiopters);
-                mat.SetFloat("_DepthMultiplier", blur.depthIntensityMultiplier);
-                mat.SetFloat("_DefocusSign", (float)blur.defocusMode);
+                    (blur.useDepth && hasDepth) ? 1f : 0f);
+               
+                float distanceIntensity = masterIntensity;
 
+                // 0 → 1 normalisieren
+                float t = Mathf.Clamp01(distanceIntensity / 2.0f);
+
+                // nichtlinear (wichtig!)
+                t = t * t;
+
+                // Basis = dein „normales Sehen“
+                float baseFocus = blur.focusDistance;
+
+                // Grenzen definieren
+                float minFocus = 0.05f;   // sehr nah (starke Myopie)
+                float maxFocus = 2.0f;    // sehr weit (Hyperopie)
+
+                // Fokus berechnen
+                float focus;
+
+                if (blur.focusMode > 0) // Myopie
+                {
+                    // Intensität ↑ → Fokus näher
+                    focus = Mathf.Lerp(baseFocus, minFocus, t);
+                }
+                else // Hyperopie
+                {
+                    // Intensität ↑ → Fokus weiter weg
+                    focus = Mathf.Lerp(baseFocus, maxFocus, t);
+                }
+                Debug.Log("Aktuelle Distanz:" + focus);
+                mat.SetFloat("_FocusDistance", focus);
+                mat.SetFloat("_DefocusSign", (float)blur.focusMode);
                 mat.SetFloat("_UseFovea", blur.useFovea ? 1f : 0f);
                 mat.SetFloat("_InvertFovea", blur.invertFovea ? 1f : 0f);
                 mat.SetFloat("_FoveaRadius", blur.foveaRadius);
                 mat.SetFloat("_FoveaSoftness", blur.foveaSoftness);
                 mat.SetVector("_FoveaCenter", blur.foveaCenter);
-
-                mat.SetFloat("_ScatterStrength", scatterScaled);
-                mat.SetFloat("_ScatterThreshold", blur.scatterThreshold);
-
                 break;
             case VisualEffectType.Contrast:
                 var con = (ContrastParameters)p;
+                /*
                 float contrastScaled = Mathf.Lerp(
                     1f,
                     con.contrastFactor,
                     Mathf.Pow(normalized, 1.2f)
-                );
+                );*/
 
-                mat.SetFloat("_ContrastFactor", contrastScaled);
+                mat.SetFloat("_ContrastFactor", con.contrastFactor);
                 break;
             case VisualEffectType.FieldOfView:
                 var fov = (FieldOfViewParameters)p;
@@ -245,27 +373,13 @@ float GetDiopters(float intensity, BlurParameters blur)
 
                     irregularityScaled = fov.irregularity * Mathf.Lerp(1f, 1.8f, intensity - 1f);
                 }
-                else if (fov.defectType == FieldOfViewParameters.DefectType.Arcuate)
-                {
-
-                    radiusScaled = fov.radius * Mathf.Lerp(1f, 1.4f, intensity - 1f);
-
-                    sensitivityScaled = Mathf.Clamp01(
-                        fov.sensitivityLoss * Mathf.Pow(intensity, 1.4f)
-                    );
-
-                    softnessScaled = fov.softness * Mathf.Lerp(1f, 0.85f, intensity - 1f);
-
-                    irregularityScaled = fov.irregularity * Mathf.Lerp(1f, 1.5f, intensity - 1f);
-                }
 
                 mat.SetFloat("_Type", (float)fov.defectType);
 
-                Vector2 gazeUV;
-                if (TryGetEyeGazeUV(out gazeUV))
-                    mat.SetVector("_Center", gazeUV);
-                else
-                    mat.SetVector("_Center", fov.center);
+                profileCenter = fov.center;
+                //gazeUV = profileCenter;
+
+                mat.SetVector("_Center", gazeUV);
 
                 mat.SetFloat("_Radius", radiusScaled);
                 mat.SetFloat("_Softness", softnessScaled);
@@ -273,10 +387,6 @@ float GetDiopters(float intensity, BlurParameters blur)
                 mat.SetFloat("_Irregularity", irregularityScaled);
                 mat.SetFloat("_AngularIrregularity", fov.angularIrregularity);
                 mat.SetFloat("_NoiseScale", fov.noiseScale);
-
-                mat.SetFloat("_ArcCurvature", fov.arcCurvature);
-                mat.SetFloat("_ArcThickness", fov.arcThickness);
-                mat.SetFloat("_ArcRotation", fov.arcRotation);
                 break;
             case VisualEffectType.Distortion:
                 var dist = (DistortionParameters)p;
@@ -318,13 +428,18 @@ float GetDiopters(float intensity, BlurParameters blur)
                 break;
             case VisualEffectType.Artifacts:
                 var art = (ArtifactsParameters)p;
-                mat.SetFloat("_FloaterIntensity", art.floaterIntensity * masterIntensity);
+                mat.SetFloat("_Intensity", art.intensity * masterIntensity);
                 mat.SetFloat("_Density", art.density);
-                mat.SetFloat("_FloaterSize", art.size);
+                mat.SetFloat("_FloaterSize", art.size * masterIntensity);
                 mat.SetFloat("_DriftSpeed", art.driftSpeed);
-                mat.SetFloat("_Darkness", art.darkness);
+                mat.SetFloat("_Darkness", art.darkness * masterIntensity);
                 mat.SetFloat("_Transparency", art.transparency);
                 mat.SetFloat("_ArtifactMode", (float)art.artifactMode);
+                mat.SetFloat("_PeripheryMask", art.avoidCenter ? 1f : 0f);
+                mat.SetFloat("_PeripheryRadius", art.centerRadius);
+                mat.SetFloat("_Irregularity", art.irregularity);
+                mat.SetFloat("_NoiseScale", art.noiseScale);
+                mat.SetFloat("_Softness", art.softness);
                 Debug.Log("Mode"+ (float)art.artifactMode);
                 break;
         }
@@ -334,10 +449,26 @@ float GetDiopters(float intensity, BlurParameters blur)
 
     void Update()
     {
+
+        UpdateGaze();
+        UpdateShaderGaze();
+
+        if (inputTexture == null)
+        {
+            Debug.Log("Meta inputTexture ist NULL");
+        }
+
         bool metaInput = OVRInput.GetDown(OVRInput.RawButton.A);
         bool appleDoubleTap = (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began && Input.GetTouch(0).tapCount == 2);
 
         if (metaInput || appleDoubleTap) SwitchToNextProfile();
+
+        bool toggleComp = OVRInput.GetDown(OVRInput.RawButton.B);
+
+        if(toggleComp)
+        {
+            compensationManager.ToggleCompensation();
+        }
 
         Vector2 joy = OVRInput.Get(OVRInput.RawAxis2D.RThumbstick);
         if (Mathf.Abs(joy.x) > 0.1f)
@@ -351,19 +482,24 @@ float GetDiopters(float intensity, BlurParameters blur)
         if (!inputCopyRT.IsCreated()) inputCopyRT.Create();
 
         Graphics.Blit(inputTexture, inputCopyRT);
-        RenderTexture src = inputCopyRT;
-        RenderTexture dst = tempA;
+        RenderTexture source = inputCopyRT;
+        RenderTexture destination = tempA;
 
         foreach (Material effect in effectStack)
         {
-            Graphics.Blit(src, dst, effect);
-            src = dst;
-            dst = (src == tempA) ? tempB : tempA;
+            Graphics.Blit(source, destination, effect);
+            source = destination;
+            destination = (source == tempA) ? tempB : tempA;
         }
-        Graphics.Blit(src, outputRT);
+        Graphics.Blit(source, outputRT);
+        RenderTexture finalOutput = compensationManager.Process(outputRT);
+
+        displayMaterial.mainTexture = finalOutput;
 
         if (Application.platform == RuntimePlatform.IPhonePlayer && screenOutputUI != null)
             screenOutputUI.texture = outputRT;
+
+        Debug.Log("Pipeline läuft – Effekte: " + effectStack.Count);
     }
 
     void OnDestroy()

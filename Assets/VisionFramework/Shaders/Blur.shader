@@ -4,8 +4,7 @@ Shader "Vision/Filter/UnifiedBlurPSF"
     {
         _MainTex ("Source", 2D) = "white" {}
 
-        _EnableBlur ("Enable Blur", Float) = 1
-        _BaseStrength ("Base Strength", Float) = 0.002
+        _BlurStrength ("Blur Strength", Float) = 0.002
 
         _Anisotropy ("Anisotropy", Range(0,1)) = 0
         _AxisAngle ("Axis Angle", Float) = 0
@@ -14,7 +13,6 @@ Shader "Vision/Filter/UnifiedBlurPSF"
         _CameraDepthTexture ("Depth", 2D) = "black" {}
         _UseDepth ("Use Depth", Float) = 0
         _FocusDistance ("Focus Distance", Float) = 0.5
-        _DepthMultiplier ("Depth Multiplier", Float) = 1
 	_DefocusSign ("Defocus Sign", Float) = 1
 
         _UseFovea ("Use Fovea", Float) = 0
@@ -22,12 +20,6 @@ Shader "Vision/Filter/UnifiedBlurPSF"
         _FoveaCenter ("Fovea Center", Vector) = (0.5,0.5,0,0)
         _FoveaRadius ("Fovea Radius", Float) = 0.25
         _FoveaSoftness ("Fovea Softness", Float) = 0.15
-
-        _ChromaticShift ("Chromatic Shift", Float) = 0
-        _AnisoContrastLoss ("Aniso Contrast Loss", Float) = 0
-
-        _ScatterStrength ("Scatter Strength", Range(0,1)) = 0
-        _ScatterThreshold ("Scatter Threshold", Range(0,1)) = 0.6
     }
 
     SubShader
@@ -44,15 +36,13 @@ Shader "Vision/Filter/UnifiedBlurPSF"
             sampler2D _MainTex;
             sampler2D _CameraDepthTexture;
 
-            float _EnableBlur;
-            float _BaseStrength;
+            float _BlurStrength;
             float _Anisotropy;
             float _AxisAngle;
             int _Samples;
 
             float _UseDepth;
             float _FocusDistance;
-            float _DepthMultiplier;
 	    float _DefocusSign;
 
             float _UseFovea;
@@ -60,12 +50,6 @@ Shader "Vision/Filter/UnifiedBlurPSF"
             float2 _FoveaCenter;
             float _FoveaRadius;
             float _FoveaSoftness;
-
-            float _ChromaticShift;
-            float _AnisoContrastLoss;
-
-            float _ScatterStrength;
-            float _ScatterThreshold;
 
             struct v2f
             {
@@ -85,31 +69,43 @@ Shader "Vision/Filter/UnifiedBlurPSF"
             {
                 float4 original = tex2D(_MainTex, i.uv);
 
-                if (_EnableBlur < 0.5)
-                    return original;
+		if(_BlurStrength < 0.0001)
+			return original;
 
-                float blurStrength = _BaseStrength;
+                float blurStrength = _BlurStrength;
 
                 if (_UseDepth > 0.5)
                 {
-                    float depth = tex2D(_CameraDepthTexture, i.uv).r;
-                    float diff = (depth - _FocusDistance) * _DefocusSign;
-		    diff = max(0, diff);
-                    blurStrength *= diff * diff * _DepthMultiplier;
+                     float depth = tex2D(_CameraDepthTexture, i.uv).r;
+depth = pow(depth, 1.3);
+
+float defocus = 0;
+
+if (_DefocusSign > 0)
+    defocus = max(0, depth - _FocusDistance);
+else 
+    defocus = max(0, _FocusDistance - depth);
+
+float blurFactor = pow(defocus, 1.3);
+
+// kleine Verstärkung für Wahrnehmbarkeit
+blurFactor *= 2.0;
+
+// optional clamp
+blurFactor = saturate(blurFactor);
+
+blurStrength *= blurFactor;
                 }
 
                 int samples = _Samples;
 
                 float4 col = 0;
                 float weightSum = 0;
-                float4 scatterAccum = 0;
-
-                // ===== PSF Blur =====
-
+            
                 if (_Anisotropy < 0.05)
                 {
                     float goldenAngle = 2.39996323;
-int sampleCount = samples * samples;
+		    int sampleCount = samples * 4;
 
 for(int s = 0; s < sampleCount; s++)
 {
@@ -130,7 +126,7 @@ for(int s = 0; s < sampleCount; s++)
                 else
                 {
                     float goldenAngle = 2.39996323;
-int sampleCount = samples * samples;
+int sampleCount = samples * 4;
 
 float rad = _AxisAngle * 0.0174533;
 float2 majorAxis = float2(cos(rad), sin(rad));
@@ -146,10 +142,13 @@ for(int s = 0; s < sampleCount; s++)
 
     float2 disk = float2(cos(theta), sin(theta));
 
-    // ⭐ elliptische Skalierung
     float2 offset =
-        majorAxis * disk.x * major +
-        minorAxis * disk.y * minor;
+    majorAxis * disk.x * major +
+    minorAxis * disk.y * minor;
+
+float distortion = _Anisotropy * 0.3 * blurStrength;
+
+offset += majorAxis * distortion * r;
 
     float4 sampleCol = tex2D(_MainTex, i.uv + offset);
 
@@ -161,14 +160,6 @@ for(int s = 0; s < sampleCount; s++)
 
                 float4 finalColor=col/weightSum;
 
-                // ===== Cataract Scatter =====
-                if(_ScatterStrength>0)
-                {
-                    float4 scatter=scatterAccum/weightSum;
-                    finalColor=lerp(finalColor,finalColor+scatter,_ScatterStrength);
-                }
-
-                // ===== Fovea Mask =====
                 if(_UseFovea>0.5)
                 {
                     float dist=distance(i.uv,_FoveaCenter);

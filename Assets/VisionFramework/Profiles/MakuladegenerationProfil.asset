@@ -39,7 +39,9 @@ MonoBehaviour:
         softness: 0.051
         center: {x: 0.5, y: 0.5}
         sensitivityLoss: 0.85
-        irregularity: 0
+        irregularity: 0.02005
+        angularIrregularity: 0.05
+        noiseScale: 6
         arcCurvature: 0.25
         arcThickness: 0.05
         arcRotation: 0

@@ -15,22 +15,23 @@ MonoBehaviour:
   profileName: Glaukom
   effects:
   - parameters:
-      rid: 4338545421758234708
+      rid: 5782344990880694546
   references:
     version: 2
     RefIds:
-    - rid: 4338545421758234708
-      type: {class: FieldOfViewParameters, ns: , asm: Assembly-CSharp}
+    - rid: 5782344990880694546
+      type: {class: ArtifactsParameters, ns: , asm: Assembly-CSharp}
       data:
-        effectType: 2
-        defectType: 1
-        radius: 0.15
-        softness: 0.101
-        center: {x: 0.5, y: 0.5}
-        sensitivityLoss: 0.75
-        irregularity: 0.02
-        angularIrregularity: 0.08
-        noiseScale: 3
-        arcCurvature: 0.25
-        arcThickness: 0.03
-        arcRotation: 0
+        effectType: 5
+        floaterIntensity: 1
+        density: 12.04
+        size: 0.501
+        driftSpeed: 0.2
+        darkness: 0.5
+        transparency: 0
+        avoidCenter: 1
+        centerRadius: 0.1
+        irregularity: 0.05
+        noiseScale: 6
+        softness: 0.02
+        artifactMode: 0
