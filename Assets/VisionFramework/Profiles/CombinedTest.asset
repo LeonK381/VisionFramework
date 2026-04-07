@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e82de60de02164ef4a6ee56733f4f779, type: 3}
+  m_Name: CombinedTest
+  m_EditorClassIdentifier: 
+  profileName: Combined 0.6
+  effects:
+  - parameters:
+      rid: 8082162695826309201
+  references:
+    version: 2
+    RefIds:
+    - rid: 8082162695826309201
+      type: {class: ContrastParameters, ns: , asm: Assembly-CSharp}
+      data:
+        effectType: 1
+        contrastFactor: 0.601

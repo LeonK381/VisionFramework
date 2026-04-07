@@ -130,6 +130,7 @@ bool IsTouchOnSlider()
         ApplyProfile(activeProfile);
         gazeUV = profileCenter;
         UpdateUI(activeProfile.profileName); 
+        compensationManager.ResetCompensation();
     }
 
     private void UpdateUI(string profileName)
@@ -327,9 +328,21 @@ void UpdateTouchGaze()
                 mat.SetFloat("_FoveaRadius", blur.foveaRadius);
                 mat.SetFloat("_FoveaSoftness", blur.foveaSoftness);
                 mat.SetVector("_FoveaCenter", blur.foveaCenter);
+
+                var blurAnalyzer    = compensationManager.GetAnalyzer<BlurAnalyzer>();
+                
+
+                if (blurAnalyzer    != null)
+                    blurAnalyzer.SetSimulationParams(blurStrength);
                 break;
             case VisualEffectType.Contrast:
                 var con = (ContrastParameters)p;
+                var contrastAnalyzer = compensationManager.GetAnalyzer<ContrastAnalyzer>();
+                
+
+                if (contrastAnalyzer    != null)
+                    contrastAnalyzer.SetSimulationParams(con.contrastFactor);
+                
                 /*
                 float contrastScaled = Mathf.Lerp(
                     1f,
@@ -444,7 +457,14 @@ void UpdateTouchGaze()
                 break;
         }
         effectStack.Add(mat);
+
+        
     }
+    var activeTypes = new List<VisualEffectType>();
+        foreach (var entry in profile.effects)
+            activeTypes.Add(entry.parameters.effectType);
+
+    compensationManager.SetActiveEffects(activeTypes);
 }
 
     void Update()
@@ -467,6 +487,7 @@ void UpdateTouchGaze()
 
         if(toggleComp)
         {
+            Debug.Log("B Button gedrückt");
             compensationManager.ToggleCompensation();
         }
 

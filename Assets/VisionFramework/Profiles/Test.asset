@@ -12,26 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e82de60de02164ef4a6ee56733f4f779, type: 3}
   m_Name: Test
   m_EditorClassIdentifier: 
-  profileName: Test
+  profileName: Test 0.25
   effects:
   - parameters:
-      rid: 5782344990880694547
+      rid: 5782345532530229327
   references:
     version: 2
     RefIds:
-    - rid: 5782344990880694547
-      type: {class: BlurParameters, ns: , asm: Assembly-CSharp}
+    - rid: 5782345532530229327
+      type: {class: ContrastParameters, ns: , asm: Assembly-CSharp}
       data:
-        effectType: 0
-        blurStrength: 2.138
-        sampleCount: 7
-        anisotropy: 0
-        axisAngle: 0
-        useDepth: 0
-        focusDistance: 0.5
-        focusMode: 0
-        useFovea: 0
-        invertFovea: 0
-        foveaRadius: 0.25
-        foveaSoftness: 0.15
-        foveaCenter: {x: 0.5, y: 0.5}
+        effectType: 1
+        contrastFactor: 0.25
