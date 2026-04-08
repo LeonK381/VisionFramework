@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class AnalysisResult
 {
     public VisualEffectType effectType;
-    public float severity;      // 0..1
-    public float confidence;    // 0..1
+    public float severity;      
+    public float confidence;   
     public Dictionary<string, float> parameters = new Dictionary<string, float>();
 }

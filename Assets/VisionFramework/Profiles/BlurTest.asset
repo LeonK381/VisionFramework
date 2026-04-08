@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e82de60de02164ef4a6ee56733f4f779, type: 3}
   m_Name: BlurTest
   m_EditorClassIdentifier: 
-  profileName: 
+  profileName: Blur Test
   effects:
   - parameters:
       rid: 5782345532530229328

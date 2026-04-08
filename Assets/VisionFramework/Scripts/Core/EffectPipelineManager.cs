@@ -350,7 +350,7 @@ void UpdateTouchGaze()
                     Mathf.Pow(normalized, 1.2f)
                 );*/
 
-                mat.SetFloat("_ContrastFactor", con.contrastFactor);
+                mat.SetFloat("_ContrastFactor", con.contrastFactor * masterIntensity);
                 break;
             case VisualEffectType.FieldOfView:
                 var fov = (FieldOfViewParameters)p;
@@ -438,6 +438,15 @@ void UpdateTouchGaze()
                     colorMatrix.SetRow(3, new Vector4(0,0,0,1));
                 }
                 mat.SetMatrix("_ColorMatrix", colorMatrix);
+                Debug.Log($">>> ColorChange: defectType={colorParams.defectType}, "
+                + $"als int={(int)colorParams.defectType}");
+                 var colorAnalyzer = compensationManager.GetAnalyzer<ColorAnalyzer>();
+
+                if (colorAnalyzer != null)
+                {
+                    colorAnalyzer.SetSimulationParams(colorParams.defectType, colorParams.intensity);
+                    Debug.Log($">>> ColorChange: {colorParams.defectType}");
+                }
                 break;
             case VisualEffectType.Artifacts:
                 var art = (ArtifactsParameters)p;

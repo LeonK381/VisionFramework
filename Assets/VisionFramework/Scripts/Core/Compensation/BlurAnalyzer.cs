@@ -14,26 +14,20 @@ public class BlurAnalyzer : InteractiveAnalyzer
 
     [Header("UI Elemente")]
     public TextMeshProUGUI instructionText;
-    public TextMeshProUGUI stimulusText;      // zeigt den Buchstaben/die Zahl
+    public TextMeshProUGUI stimulusText;      
     public TextMeshProUGUI progressText;
-    public Button yesButton;                  // "Kann ich lesen"
-    public Button noButton;                   // "Kann ich nicht lesen"
+    public Button yesButton;               
+    public Button noButton;                  
 
     [Header("Simulation auf Stimulus")]
-    public Material blurSimulationMaterial;   // gleicher Shader wie Simulation
-    public RawImage stimulusDisplay;          // RawImage statt TMP für simulierten Text
+    public Material blurSimulationMaterial;  
+    public RawImage stimulusDisplay;          
 
     [Header("Stimulus Kamera")]
-    public Camera     stimulusCamera;        // separate Kamera
-    public RenderTexture stimulusSourceRT;   // Kamera rendert hierhin
-    public RenderTexture stimulusBlurredRT;  // Blur wird hierhin geschrieben
-
-    // Wissenschaftliche Basis: ETDRS (Ferris et al., 1982)
-    // Schriftgrößen in normalisierter Einheit (1.0 = sehr groß, 0.05 = sehr klein)
-    // Logarithmische Skalierung: 0.1 log-Einheiten pro Schritt
+    public Camera     stimulusCamera;     
+    public RenderTexture stimulusSourceRT;  
+    public RenderTexture stimulusBlurredRT; 
     private float[] sizeLevels;
-
-    // ETDRS Optotypen – standardisierte Buchstaben ohne Verwechslungsgefahr
     private string[] optotypes = { "E", "F", "P", "T", "O", "Z", "L", "D" };
 
     private int   currentStep;
@@ -50,11 +44,8 @@ public class BlurAnalyzer : InteractiveAnalyzer
     private GameObject ActivePanel => Application.platform == RuntimePlatform.Android
         ? metaTestPanel : appleTestPanel;
 
-    // ── Awake: Größenstufen generieren ──────────────────────────────
     void Awake()
     {
-        // Logarithmische Skalierung nach Bailey & Lovie (1976)
-        // 0.1 log-Einheiten pro Schritt – Standard für ETDRS
         sizeLevels = GenerateLogSizes(1.0f, 0.05f, 0.1f);
 
         Debug.Log($">>> BlurAnalyzer: {sizeLevels.Length} Größenstufen generiert");
@@ -62,13 +53,11 @@ public class BlurAnalyzer : InteractiveAnalyzer
             Debug.Log($"    Größe: {s:F3}");
     }
 
-    // Logarithmisch gestufte Größen – Bailey & Lovie (1976)
     static float[] GenerateLogSizes(float startSize, float endSize, float stepSize)
     {
         var steps = new List<float>();
-        float logStart = Mathf.Log10(startSize); //  0.0
-        float logEnd   = Mathf.Log10(endSize);   // -1.3
-
+        float logStart = Mathf.Log10(startSize); 
+        float logEnd   = Mathf.Log10(endSize);   
         for (float log = logStart; log >= logEnd; log -= stepSize)
         {
             float size = Mathf.Pow(10f, log);
@@ -153,7 +142,6 @@ public override void StartAnalysis(Action<AnalysisResult> callback)
     float size    = sizeLevels[currentStep];
     string letter = optotypes[UnityEngine.Random.Range(0, optotypes.Length)];
 
-    // Buchstabe per TMP setzen
     if (stimulusText != null)
     {
         stimulusText.text     = letter;
@@ -165,8 +153,6 @@ public override void StartAnalysis(Action<AnalysisResult> callback)
 
     Debug.Log($">>> Zeige Buchstabe '{letter}' in Größe {size:F3}");
 
-    // Blur im nächsten Frame anwenden
-    // (Kamera braucht einen Frame um zu rendern)
     StartCoroutine(ApplyBlurNextFrame());
 }
     void OnYes()
@@ -190,16 +176,10 @@ void Finish()
     testActive = false;
     ActivePanel.SetActive(false);
 
-    // lastSeenSize: 1.0 = nur Großes erkannt = schlechte Sehschärfe
-    //               0.05 = Kleines erkannt   = gute Sehschärfe
-    // severity: 1.0 = schlecht, 0.0 = gut → direkt invertieren
     float severity = 1.0f - Mathf.Clamp01(
         (lastSeenSize - 0.05f) / (1.0f - 0.05f)
     );
 
-    // compensationStrength: ebenfalls direkt aus lastSeenSize
-    // lastSeenSize groß → viel Kompensation
-    // lastSeenSize klein → wenig Kompensation
     float compensationStrength = MapSizeToCompensation(lastSeenSize);
 
     var result = new AnalysisResult
@@ -221,17 +201,10 @@ void Finish()
 
 float MapSizeToCompensation(float lastSeenSize)
 {
-    // lastSeenSize 1.0  → schlechteste Sehschärfe → maximale Kompensation
-    // lastSeenSize 0.05 → beste Sehschärfe         → keine Kompensation
-    //
-    // Nichtlineare Skalierung nach Stevens (1957) – Potenzgesetz
-    // Wahrnehmungsunterschiede sind nicht linear
     float normalized = Mathf.Clamp01(
         (lastSeenSize - 0.05f) / (1.0f - 0.05f)
     );
 
-    // Quadratwurzel: schnell ansteigend bei niedrigen Werten
-    // → auch moderate Beeinträchtigung erzeugt merkbare Kompensation
     float t = Mathf.Pow(normalized, 0.5f);
 
     return Mathf.Lerp(0f, 2.5f, t);
@@ -257,12 +230,10 @@ System.Collections.IEnumerator ApplyBlurNextFrame()
 {
     yield return new WaitForEndOfFrame();
 
-    // RT auf opaque weiß setzen falls Alpha 0
     RenderTexture.active = stimulusSourceRT;
-    GL.Clear(true, true, new Color(1f, 1f, 1f, 1f)); // weiß, Alpha 1
+    GL.Clear(true, true, new Color(1f, 1f, 1f, 1f)); 
     RenderTexture.active = null;
 
-    // Blur anwenden
     if (blurSimulationMaterial != null
         && stimulusBlurredRT    != null
         && activeBlurStrength   > 0f)

@@ -21,11 +21,9 @@ public class ContrastAnalyzer : InteractiveAnalyzer
     [Header("Simulation auf Patches")]
     public Material contrastSimulationMaterial;
 
-    // ── Plattform-Helper ─────────────────────────────────────────────
     private GameObject ActivePanel => Application.platform == RuntimePlatform.Android
         ? metaTestPanel : appleTestPanel;
 
-    // ── Test-Zustand ─────────────────────────────────────────────────
     private float[] contrastLevels;
     private int   currentStep;
     private int   consecutiveFails;
@@ -39,8 +37,6 @@ public class ContrastAnalyzer : InteractiveAnalyzer
     // ── Awake ────────────────────────────────────────────────────────
     void Awake()
     {
-        // Pelli et al. (1988): 0.15 log-Einheiten pro Schritt
-        // Bereich 0.0 bis -1.65 log → 12 Schritte
         contrastLevels = GenerateLogSteps(0.0f, -1.65f, 0.15f);
         Debug.Log($">>> ContrastLevels generiert: {contrastLevels.Length} Schritte");
     }
@@ -60,26 +56,11 @@ void GenerateLevelsForSimulation()
 {
     if (activeContrastFactor >= 1.0f)
     {
-        // Keine Simulation: Standard Pelli-Robson 0.15
         contrastLevels = GenerateLogSteps(0.0f, -1.65f, 0.15f);
         return;
     }
-
-    // Mit Simulation: größere Schrittweite damit Unterschiede
-    // schneller unter die Wahrnehmungsschwelle fallen
-    // Bei cf=0.25 soll Nutzer bei Schritt 4-6 aufhören
-    //
-    // Schrittweite basiert auf contrastFactor:
-    // Starker Verlust (cf niedrig) → große Schritte → früh aufhören
-    // Schwacher Verlust (cf hoch)  → kleine Schritte → spät aufhören
-    //
-    // Formel: stepSize = 0.15 / contrastFactor
-    // cf=1.0  → 0.15 (Standard)
-    // cf=0.5  → 0.30
-    // cf=0.25 → 0.60
     float stepSize = Mathf.Clamp(0.15f / activeContrastFactor, 0.15f, 0.80f);
 
-    // 12 Schritte fest – Endpunkt ergibt sich aus Schrittweite
     float endLog = -(stepSize * 11f);
 
     contrastLevels = GenerateLogSteps(0.0f, endLog, stepSize);
@@ -92,25 +73,23 @@ void GenerateLevelsForSimulation()
    public void SetSimulationParams(float contrastFactor)
 {
     activeContrastFactor = contrastFactor;
-    GenerateLevelsForSimulation(); // Levels neu berechnen
+    GenerateLevelsForSimulation(); 
     Debug.Log($">>> ContrastAnalyzer: contrastFactor={contrastFactor}, "
             + $"Levels={contrastLevels.Length}");
 }
 
-    // ── Einstiegspunkt ───────────────────────────────────────────────
     public override void StartAnalysis(Action<AnalysisResult> callback)
 {
     Debug.Log($">>> ContrastAnalyzer.StartAnalysis – currentStep VOR Reset: {currentStep}");
     
     onComplete       = callback;
-    currentStep      = 0;  // ← wird das wirklich ausgeführt?
+    currentStep      = 0; 
     consecutiveFails = 0;
     lastSeenContrast = 1.0f;
     testActive       = true;
 
     Debug.Log($">>> ContrastAnalyzer.StartAnalysis – currentStep NACH Reset: {currentStep}");
 
-    // DEBUG
     Debug.Log(">>> ContrastAnalyzer.StartAnalysis aufgerufen");
     Debug.Log($">>> metaTestPanel: {metaTestPanel}");
     Debug.Log($">>> Plattform: {Application.platform}");
@@ -133,7 +112,6 @@ void GenerateLevelsForSimulation()
     BindButtons();
     ShowStep();
 
-    // NEU – nach allem anderen:
     Debug.Log($">>> Nach ShowStep – Panel Status:");
     Debug.Log($">>> metaTestPanel activeSelf: {metaTestPanel?.activeSelf}");
     Debug.Log($">>> metaTestPanel activeInHierarchy: {metaTestPanel?.activeInHierarchy}");
@@ -144,7 +122,6 @@ void GenerateLevelsForSimulation()
     Debug.Log($">>> leftPatch activeInHierarchy: {leftPatch?.gameObject.activeInHierarchy}");
 }
 
-    // ── Buttons binden ───────────────────────────────────────────────
     void BindButtons()
     {
         if (ActivePanel == null)
@@ -164,16 +141,12 @@ void GenerateLevelsForSimulation()
         }
     }
 
-    // ── Schritt anzeigen ─────────────────────────────────────────────
 void ShowStep()
 {
     if (currentStep >= contrastLevels.Length) { Finish(); return; }
 
     float c = contrastLevels[currentStep];
 
-    // Kein adjustedC – Patches werden direkt durch Simulation gedämpft
-    // Das ist der wissenschaftlich korrekte Ansatz:
-    // Der Test misst die Wahrnehmungsschwelle UNTER der Simulation
     Texture2D baseLeft  = MakePatch(new Color(0.5f, 0.5f, 0.5f));
     Texture2D baseRight = MakePatch(new Color(
         0.5f + c * 0.5f,
@@ -189,8 +162,6 @@ void ShowStep()
     Destroy(baseLeft);
     Destroy(baseRight);
 }
-
-    // ── Patch-Hilfsmethoden ──────────────────────────────────────────
     Texture2D MakePatch(Color color)
     {
         var tex = new Texture2D(128, 128);
@@ -211,7 +182,6 @@ void ShowStep()
         contrastSimulationMaterial.SetFloat("_ContrastFactor", activeContrastFactor);
         Graphics.Blit(baseTex, rt, contrastSimulationMaterial);
 
-        // Prüfe ob Simulation wirkt
         RenderTexture.active = rt;
         Texture2D check = new Texture2D(1, 1);
         check.ReadPixels(new Rect(64, 64, 1, 1), 0, 0);
@@ -231,7 +201,6 @@ void ShowStep()
     return rt;
 }
 
-    // ── Antworten ────────────────────────────────────────────────────
     void OnYes()
     {
         lastSeenContrast = contrastLevels[currentStep];
@@ -248,31 +217,20 @@ void ShowStep()
         ShowStep();
     }
 
-    // ── Ergebnis berechnen ───────────────────────────────────────────
     void Finish()
 {
     testActive = false;
     ActivePanel.SetActive(false);
 
-    // Relative Position im Test
-    // currentStep = Schritt bei dem aufgehört wurde
-    // 0 = sofort aufgehört = maximale Beeinträchtigung
-    // contrastLevels.Length-1 = letzter Schritt = minimale Beeinträchtigung
-
-    // lastSeenIndex = letzter Schritt bei dem Ja gedrückt wurde
     int lastSeenIndex = System.Array.IndexOf(contrastLevels, lastSeenContrast);
     if (lastSeenIndex < 0) lastSeenIndex = currentStep - 1;
 
-    // severity: 0 Schritte geschafft → severity=1.0
-    //           alle Schritte geschafft → severity=0.0
     float severity = 1.0f - Mathf.Clamp01(
         (float)lastSeenIndex / (contrastLevels.Length - 1)
     );
 
-    // GammaEstimate aus severity
     float gammaEstimate = Mathf.Lerp(1.0f, 2.5f, severity);
 
-    // logThreshold für wissenschaftliche Dokumentation
     float logThreshold = Mathf.Log10(lastSeenContrast);
 
     var result = new AnalysisResult
@@ -293,16 +251,12 @@ void ShowStep()
 
     onComplete?.Invoke(result);
 }
-
-    // ── Controller Input ─────────────────────────────────────────────
     void Update()
     {
         if (!testActive) return;
         if (OVRInput.GetDown(OVRInput.RawButton.X)) { Debug.Log(">>> X: Ja");   OnYes(); }
         if (OVRInput.GetDown(OVRInput.RawButton.Y)) { Debug.Log(">>> Y: Nein"); OnNo();  }
     }
-
-    // ── Cleanup ──────────────────────────────────────────────────────
     public override void Cleanup()
     {
         testActive = false;

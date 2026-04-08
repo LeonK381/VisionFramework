@@ -12,10 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e82de60de02164ef4a6ee56733f4f779, type: 3}
   m_Name: CombinedTest
   m_EditorClassIdentifier: 
-  profileName: Combined 0.6
+  profileName: Combined Test
   effects:
   - parameters:
       rid: 8082162695826309201
+  - parameters:
+      rid: 8082162695826309202
   references:
     version: 2
     RefIds:
@@ -24,3 +26,19 @@ MonoBehaviour:
       data:
         effectType: 1
         contrastFactor: 0.601
+    - rid: 8082162695826309202
+      type: {class: BlurParameters, ns: , asm: Assembly-CSharp}
+      data:
+        effectType: 0
+        blurStrength: 0.75
+        sampleCount: 7
+        anisotropy: 0
+        axisAngle: 0
+        useDepth: 0
+        focusDistance: 0.5
+        focusMode: 0
+        useFovea: 0
+        invertFovea: 0
+        foveaRadius: 0.25
+        foveaSoftness: 0.15
+        foveaCenter: {x: 0.5, y: 0.5}
