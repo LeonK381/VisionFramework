@@ -25,19 +25,23 @@ MonoBehaviour:
       type: {class: ContrastParameters, ns: , asm: Assembly-CSharp}
       data:
         effectType: 1
-        contrastFactor: 0.9
+        contrastFactor: 0.4
     - rid: 4338545552221798407
       type: {class: FieldOfViewParameters, ns: , asm: Assembly-CSharp}
       data:
         effectType: 2
         defectType: 1
+        sensitivityLoss: 1
         radius: 0.15
         softness: 0.1
         center: {x: 0.5, y: 0.5}
-        sensitivityLoss: 0.85
         irregularity: 0.01
         angularIrregularity: 0.04
         noiseScale: 3
-        arcCurvature: 0.25
-        arcThickness: 0.05
-        arcRotation: 0
+        density: 10
+        spotSize: 0.06
+        darkness: 1
+        spotSoftness: 0.02
+        asymmetry: 0.6
+        preferPeriphery: 0
+        peripheryRadius: 0.3

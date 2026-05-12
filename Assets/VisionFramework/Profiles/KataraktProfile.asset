@@ -27,31 +27,26 @@ MonoBehaviour:
       type: {class: ContrastParameters, ns: , asm: Assembly-CSharp}
       data:
         effectType: 1
-        contrastFactor: 0.9
+        contrastFactor: 0.4
     - rid: 4338545421758234707
       type: {class: BlurParameters, ns: , asm: Assembly-CSharp}
       data:
         effectType: 0
-        blurStrength: 0.52
+        blurStrength: 0.85
+        sampleCount: 7
         anisotropy: 0
         axisAngle: 0
-        samples: 7
-        useDepthBlur: 0
+        useDepth: 0
         focusDistance: 0.5
-        maxDiopters: 6
-        defocusMode: 0
+        focusMode: 0
         useFovea: 0
         invertFovea: 0
         foveaRadius: 0.25
         foveaSoftness: 0.15
         foveaCenter: {x: 0.5, y: 0.5}
-        chromaticShift: 0
-        anisotropicContrastLoss: 0
-        scatterStrength: 0.251
-        scatterThreshold: 0.601
     - rid: 4338545484542246994
       type: {class: ColorChangeParameters, ns: , asm: Assembly-CSharp}
       data:
         effectType: 4
         defectType: 2
-        intensity: 0.15
+        intensity: 0.4

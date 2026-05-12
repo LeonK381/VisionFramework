@@ -15,20 +15,20 @@ MonoBehaviour:
   profileName: Myopie
   effects:
   - parameters:
-      rid: 4338545780308312143
+      rid: 4052468065313751120
   references:
     version: 2
     RefIds:
-    - rid: 4338545780308312143
+    - rid: 4052468065313751120
       type: {class: BlurParameters, ns: , asm: Assembly-CSharp}
       data:
         effectType: 0
-        blurStrength: 1.51
+        blurStrength: 1
         sampleCount: 7
         anisotropy: 0
         axisAngle: 0
         useDepth: 1
-        focusDistance: 2
+        focusDistance: 0.5
         focusMode: 1
         useFovea: 0
         invertFovea: 0

@@ -17,9 +17,7 @@ MonoBehaviour:
   - parameters:
       rid: 4338545552221798400
   - parameters:
-      rid: 4338545552221798401
-  - parameters:
-      rid: 4338545552221798402
+      rid: 8082162701828882516
   references:
     version: 2
     RefIds:
@@ -27,36 +25,23 @@ MonoBehaviour:
       type: {class: ContrastParameters, ns: , asm: Assembly-CSharp}
       data:
         effectType: 1
-        contrastFactor: 0.9
-    - rid: 4338545552221798401
-      type: {class: ArtifactsParameters, ns: , asm: Assembly-CSharp}
+        contrastFactor: 0.4
+    - rid: 8082162701828882516
+      type: {class: FieldOfViewParameters, ns: , asm: Assembly-CSharp}
       data:
-        effectType: 5
-        floaterIntensity: 1
-        density: 12.02
-        size: 0.504
-        driftSpeed: 0
-        darkness: 1
-        transparency: 0.2
-        avoidCenter: 0
-        centerRadius: 0.4
-        irregularity: 0.02
+        effectType: 2
+        defectType: 2
+        sensitivityLoss: 1
+        radius: 0.3
+        softness: 0.1
+        center: {x: 0.5, y: 0.5}
+        irregularity: 0
+        angularIrregularity: 0.01
         noiseScale: 6
-        softness: 0.05
-        artifactMode: 0
-    - rid: 4338545552221798402
-      type: {class: BlurParameters, ns: , asm: Assembly-CSharp}
-      data:
-        effectType: 0
-        blurStrength: 0.2
-        sampleCount: 7
-        anisotropy: 0
-        axisAngle: 0
-        useDepth: 0
-        focusDistance: 0.5
-        focusMode: 0
-        useFovea: 0
-        invertFovea: 0
-        foveaRadius: 0.25
-        foveaSoftness: 0.15
-        foveaCenter: {x: 0.5, y: 0.5}
+        density: 13
+        spotSize: 0.0702
+        darkness: 1
+        spotSoftness: 0.02
+        asymmetry: 0.4
+        preferPeriphery: 0
+        peripheryRadius: 0.3

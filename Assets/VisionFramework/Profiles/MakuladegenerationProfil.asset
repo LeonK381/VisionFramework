@@ -35,13 +35,17 @@ MonoBehaviour:
       data:
         effectType: 2
         defectType: 0
+        sensitivityLoss: 1
         radius: 0.101
-        softness: 0.051
+        softness: 0.041
         center: {x: 0.5, y: 0.5}
-        sensitivityLoss: 0.85
         irregularity: 0.02005
         angularIrregularity: 0.05
         noiseScale: 6
-        arcCurvature: 0.25
-        arcThickness: 0.05
-        arcRotation: 0
+        density: 10
+        spotSize: 0.06
+        darkness: 0.9
+        spotSoftness: 0.02
+        asymmetry: 0.6
+        preferPeriphery: 0
+        peripheryRadius: 0.3

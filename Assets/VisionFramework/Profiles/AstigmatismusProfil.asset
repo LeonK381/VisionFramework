@@ -16,6 +16,8 @@ MonoBehaviour:
   effects:
   - parameters:
       rid: 4338545870973435983
+  - parameters:
+      rid: 8082162793750986834
   references:
     version: 2
     RefIds:
@@ -24,19 +26,23 @@ MonoBehaviour:
       data:
         effectType: 0
         blurStrength: 1
+        sampleCount: 7
         anisotropy: 0.801
         axisAngle: 45.2
-        samples: 11
-        useDepthBlur: 0
+        useDepth: 0
         focusDistance: 0.5
-        maxDiopters: 6
-        defocusMode: 0
+        focusMode: 0
         useFovea: 0
         invertFovea: 0
         foveaRadius: 0.25
         foveaSoftness: 0.15
         foveaCenter: {x: 0.5, y: 0.5}
-        chromaticShift: 0.0003
-        anisotropicContrastLoss: 0.703
-        scatterStrength: 0
-        scatterThreshold: 0.6
+    - rid: 8082162793750986834
+      type: {class: DistortionParameters, ns: , asm: Assembly-CSharp}
+      data:
+        effectType: 3
+        mode: 1
+        strength: 0.01
+        rotation: 0
+        waveFrequency: 60
+        centerRadius: 0.4
