@@ -96,3 +96,19 @@ Das Projekt enthält eine vorkonfigurierte Demo-Szene:
 4. Generiertes Xcode-Projekt öffnen
 5. Mit Apple Developer Account signieren
 6. Auf Gerät deployen
+
+---
+
+## 📊 Evaluation
+
+Bildbasierte Evaluation der technischen Funktionalität der Simulationen und adaptiven Kompensationsmethoden.
+
+Der `Evaluation/`-Ordner enthält:
+- **vision_evaluation.py** – Evaluiert Simulationen und Kompensationsstrategien
+- **metric_validation.py** – Validiert alle 15 Metriken mit synthetischen Testbildern
+
+```bash
+cd Evaluation
+pip install -r requirements.txt
+python metric_validation.py
+```
