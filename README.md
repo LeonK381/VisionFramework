@@ -98,4 +98,21 @@ The project includes a pre-configured demo scene:
 5. Sign with your Apple Developer account
 6. Deploy to device
 
+---
 
+## 📊 Evaluation
+
+Image-based evaluation of the technical functionality of simulations and adaptive compensation methods
+
+### Evaluation Scripts
+
+Python scripts for objective assessment are included in the `Evaluation/` folder:
+
+- **`vision_evaluation.py`** – Evaluates simulations and compensation strategies
+- **`metric_validation.py`** – Validates metric implementations with synthetic test images
+
+```bash
+cd Evaluation
+pip install -r requirements.txt
+python metric_validation.py
+```
