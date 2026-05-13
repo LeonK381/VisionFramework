@@ -45,11 +45,12 @@ This framework enables researchers, designers, and educators to experience visua
 
 ### Automatic Package Installation
 Unity automatically installs all required packages when you open the project. The `Packages/manifest.json` includes:
-- TextMesh Pro
-- XR Plugin Management
-- AR Foundation (iOS)
-- ARKit XR Plugin (iOS)
-- Oculus XR Plugin (Meta Quest)
+- XR Plugin Management (4.5.4)
+- AR Foundation (6.3.3)
+- ARKit XR Plugin (6.3.3)
+- XR Interaction Toolkit (3.0.10)
+- Meta XR All-in-One SDK (85.0.0)
+- Meta OpenXR (2.3.0)
 
 **You don't need to manually install packages!** Unity handles this automatically.
 
