@@ -53,6 +53,7 @@ Unity automatically installs all required packages when you open the project. Th
 - Meta OpenXR (2.3.0)
 
 **You don't need to manually install packages!** Unity handles this automatically.
+> **Note:** One external component (Meta's PassthroughCameraAccess) must be added manually for Quest builds — see Quick Start step 3.
 
 ---
 
@@ -72,13 +73,17 @@ cd VisionFramework
 3. Unity 6000.0.61f1 will automatically:
    - Install all required packages
    - Configure XR settings
+  
+### 3. Add the Passthrough Camera Component (Meta Quest only)
 
-### 3. Load the Demo Scene
+The Meta Quest passthrough camera access is **not included** in this repository for licensing reasons. Download Meta's `PassthroughCamera` component from the [Unity-PassthroughCameraApiSamples](https://github.com/oculus-samples/Unity-PassthroughCameraApiSamples) repository and copy it into the project. This step is only required for Meta Quest builds; iOS builds work without it.
+
+### 4. Load the Demo Scene
 
 The project includes a pre-configured demo scene:
 - **Assets/VisionFramework/Scenes/VisionSampleScene.unity**
 
-### 4. Select Your Platform & Build
+### 5. Select Your Platform & Build
 
 #### **Option A: Meta Quest**
 
