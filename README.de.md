@@ -52,6 +52,7 @@ Unity installiert beim Öffnen des Projekts automatisch alle benötigten Package
 - Oculus XR Plugin (Meta Quest)
 
 **Sie müssen keine Packages manuell installieren!** Unity erledigt dies automatisch.
+> **Hinweis:** Eine externe Komponente (Metas Passthrough-Kamera-Zugriff) muss für Quest-Builds manuell hinzugefügt werden – siehe Quick-Start-Schritt 3.
 
 ---
 
@@ -71,6 +72,10 @@ cd VisionFramework
 3. Unity 6000.0.61f1 wird automatisch:
    - Alle benötigten Packages installieren
    - XR-Einstellungen konfigurieren
+
+### 3. Passthrough-Kamera-Komponente hinzufügen (nur Meta Quest)
+
+Der Zugriff auf die Passthrough-Kamera der Meta Quest ist aus Lizenzgründen **nicht in diesem Repository enthalten**. Lade Metas `PassthroughCamera`-Komponente aus dem Repository [Unity-PassthroughCameraApiSamples](https://github.com/oculus-samples/Unity-PassthroughCameraApiSamples) herunter und kopiere sie in das Projekt. Dieser Schritt ist nur für Meta-Quest-Builds erforderlich; iOS-Builds funktionieren ohne ihn.
 
 ### 3. Demo-Szene laden
 
